@@ -1,11 +1,164 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import type { RootState } from '@/store/store';
+import { logout } from '@/store/authSlice';
+import { getXlsxFileNames, parseFiltersFromFilenames } from "@/lib/getCsvFileNames";
+import { parseXlsx } from "@/lib/parseXlsx";
+import FilterSidebar from "@/components/FilterSidebar";
+import ProductGrid from "@/components/ProductGrid";
+import { Button } from "@/components/ui/button";
+import { LogOut } from "lucide-react";
+import { Cart } from "@/components/Cart";
+import { toast } from "@/components/ui/use-toast";
 
 const Index = () => {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { username } = useSelector((state: RootState) => state.auth);
+  const [fileNames, setFileNames] = useState<string[]>([]);
+  const [filterTypes, setFilterTypes] = useState<any>({});
+  const [selectedFile, setSelectedFile] = useState<string | null>(null);
+  const [search, setSearch] = useState("");
+  const [products, setProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const loadFileNames = async () => {
+      try {
+        const names = await getXlsxFileNames();
+        if (names.length === 0) {
+          // If no files returned and we're still on this page, it means auth failed
+          const token = localStorage.getItem('token');
+          if (!token) {
+            navigate('/auth');
+            return;
+          }
+          throw new Error('Failed to load file list');
+        }
+        setFileNames(names);
+        const { filterTypes: types } = parseFiltersFromFilenames(names);
+        setFilterTypes(types);
+      } catch (err) {
+        console.error('Failed to load file names:', err);
+        setError('Failed to load file list');
+        toast({
+          title: "Error",
+          description: err instanceof Error ? err.message : "Failed to load file list",
+          variant: "destructive"
+        });
+      }
+    };
+    loadFileNames();
+  }, [navigate]);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/auth');
+  };
+
+  useEffect(() => {
+    async function loadData() {
+      if (!selectedFile) {
+        setProducts([]);
+        setError(null);
+        return;
+      }
+
+      setLoading(true);
+      setError(null);
+      
+      try {
+        const data = await parseXlsx(selectedFile);
+        if (data.length === 0) {
+          setError('No products found in the selected file');
+        }
+        setProducts(data);
+      } catch (error) {
+        console.error('Failed to load product data:', error);
+        setError('Failed to load product data');
+        toast({
+          title: "Error",
+          description: error instanceof Error ? error.message : "Failed to load product data",
+          variant: "destructive"
+        });
+        setProducts([]);
+        
+        // Check if authentication error occurred
+        if (error.message === 'Authentication required') {
+          navigate('/auth');
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadData();
+  }, [selectedFile, navigate]);
+
+  // Filter products by search query if present
+  const filteredProducts = search ? products.filter((p) =>
+    (p.Brand || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.ItemName || "").toLowerCase().includes(search.toLowerCase()) ||
+    (p.SKU || "").toLowerCase().includes(search.toLowerCase())
+  ) : products;
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <div className="min-h-screen bg-gray-50 flex flex-col w-full">
+      <header className="w-full bg-white border-b sticky top-0 z-50 shadow-sm">
+        <div className="max-w-screen-2xl mx-auto px-4">
+          <div className="flex justify-between items-center">
+            <img 
+              src="https://alphacomm.com/wp-content/uploads/2021/05/alphacomm-logo.png" 
+              alt="AlphaComm Logo" 
+              className="h-16 py-2"
+            />
+            <div className="flex items-center gap-4">
+              <input
+                className="rounded border border-gray-300 px-3 py-2 text-sm w-72 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                placeholder="Search by product, brand, or SKU"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+              />
+              <div className="flex items-center gap-4">
+                <Cart />
+                <span className="text-sm text-gray-600">
+                  Welcome, {username || "User"}
+                </span>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={handleLogout}
+                  className="flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Logout
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <div className="flex flex-col md:flex-row flex-1">
+        <div className="md:pt-8 pt-4 md:pr-8 md:pl-8 pl-2 pr-2 flex-none md:w-72 w-full">
+          <FilterSidebar
+            filterTypes={filterTypes}
+            onSelect={setSelectedFile}
+            selectedFile={selectedFile}
+          />
+        </div>
+        <main className="flex-1 p-4 md:pt-8 max-w-screen-xl mx-auto md:pr-8">
+          <div className="flex flex-col md:flex-row items-start justify-between gap-4 mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800">Marketplace</h1>
+              <p className="text-gray-500 mt-2"></p>
+              {error && <p className="text-red-500 mt-2">{error}</p>}
+            </div>
+          </div>
+          <ProductGrid products={filteredProducts} loading={loading} />
+        </main>
       </div>
     </div>
   );
