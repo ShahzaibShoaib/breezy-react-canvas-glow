@@ -30,6 +30,11 @@ export function Cart() {
     });
   };
 
+  const navigateToOrderHistory = () => {
+    setIsOpen(false);
+    navigate('/order-history');
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
@@ -128,10 +133,7 @@ export function Cart() {
                   <Button 
                     variant="secondary"
                     className="w-full flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-1 h-8 sm:h-10" 
-                    onClick={() => {
-                      setIsOpen(false);
-                      navigate('/order-history');
-                    }}
+                    onClick={navigateToOrderHistory}
                   >
                     <History className="h-3 w-3 sm:h-4 sm:w-4" />
                     Order History

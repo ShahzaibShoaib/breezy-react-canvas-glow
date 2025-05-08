@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, ShoppingBag } from "lucide-react";
@@ -64,6 +63,7 @@ export default function OrderHistory() {
         }
 
         const data = await response.json();
+        // Always set orders to an array (empty if no data)
         setOrders(data.data || []);
       } catch (error) {
         console.error('Error fetching order history:', error);
@@ -72,6 +72,8 @@ export default function OrderHistory() {
           description: error instanceof Error ? error.message : "Failed to load order history",
           variant: "destructive"
         });
+        // Ensure we set orders to empty array on error
+        setOrders([]);
       } finally {
         setLoading(false);
       }
@@ -80,17 +82,22 @@ export default function OrderHistory() {
     fetchOrderHistory();
   }, [navigate]);
 
-  const totalAmount = orders.reduce((sum, order) => sum + order.Total_Price, 0);
+  // Calculate total only if there are orders
+  const totalAmount = orders.length > 0 
+    ? orders.reduce((sum, order) => sum + order.Total_Price, 0)
+    : 0;
 
-  // Group orders by exact time
-  const groupedOrders = orders.reduce<GroupedOrders>((groups, order) => {
-    const timeKey = format(new Date(order.Order_Time), 'MMM d, yyyy HH:mm');
-    if (!groups[timeKey]) {
-      groups[timeKey] = [];
-    }
-    groups[timeKey].push(order);
-    return groups;
-  }, {});
+  // Group orders by exact time - only if we have orders
+  const groupedOrders = orders.length > 0 
+    ? orders.reduce<GroupedOrders>((groups, order) => {
+        const timeKey = format(new Date(order.Order_Time), 'MMM d, yyyy HH:mm');
+        if (!groups[timeKey]) {
+          groups[timeKey] = [];
+        }
+        groups[timeKey].push(order);
+        return groups;
+      }, {})
+    : {};
 
   return (
     <div className="container mx-auto py-4 sm:py-8 px-2 sm:px-4 space-y-4 sm:space-y-6">
