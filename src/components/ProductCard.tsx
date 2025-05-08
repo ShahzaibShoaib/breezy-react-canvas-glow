@@ -1,10 +1,9 @@
-
 import { useState } from 'react';
 import { Loader2, Minus, Plus } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { formatDisplayText } from "@/lib/utils";
 import PlaceholderImage from "./PlaceholderImage";
-import { useCart, AddToCartItem } from "@/contexts/CartContext";
+import { useCart } from "@/contexts/CartContext";
 
 export type Product = {
   id: string;
