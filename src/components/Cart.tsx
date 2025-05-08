@@ -69,7 +69,15 @@ export function Cart() {
             <div className="flex flex-col items-center justify-center h-40 text-center">
               <ShoppingCart className="h-8 w-8 text-muted-foreground mb-2" />
               <span className="text-muted-foreground mb-1">Your cart is empty</span>
-              <span className="text-xs text-muted-foreground">Add items from the marketplace to get started</span>
+              <span className="text-xs text-muted-foreground mb-4">Add items from the marketplace to get started</span>
+              <Button 
+                variant="secondary"
+                className="flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm" 
+                onClick={navigateToOrderHistory}
+              >
+                <History className="h-3 w-3 sm:h-4 sm:w-4" />
+                View Order History
+              </Button>
             </div>
           ) : (
             <div className="space-y-4">
