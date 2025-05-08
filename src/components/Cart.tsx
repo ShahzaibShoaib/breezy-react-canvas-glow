@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ShoppingCart, Loader2, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -44,7 +45,7 @@ export function Cart() {
           )}
         </Button>
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg">
+      <SheetContent className="w-full sm:max-w-lg p-3 sm:p-6">
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             Shopping Cart
@@ -74,39 +75,39 @@ export function Cart() {
                 >
                   <div className="space-y-1 flex-1">
                     <h4 className="text-sm font-semibold line-clamp-2">{item.Item_Name}</h4>
-                    <p className="text-sm text-muted-foreground">SKU: {item.Item_SKU}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">SKU: {item.Item_SKU}</p>
                     <div className="flex items-center gap-2">
-                      <p className="text-sm text-muted-foreground">Qty: {item.Item_Qty}</p>
-                      <span className="text-sm text-muted-foreground">•</span>
-                      <p className="text-sm text-muted-foreground">${item.Price_Per_Item.toFixed(2)} each</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">Qty: {item.Item_Qty}</p>
+                      <span className="text-xs sm:text-sm text-muted-foreground">•</span>
+                      <p className="text-xs sm:text-sm text-muted-foreground">${item.Price_Per_Item.toFixed(2)} each</p>
                     </div>
-                    <p className="text-sm font-medium">Total: ${item.Total_Price.toFixed(2)}</p>
+                    <p className="text-xs sm:text-sm font-medium">Total: ${item.Total_Price.toFixed(2)}</p>
                   </div>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => handleRemoveFromCart(item)}
                     disabled={loading}
-                    className="shrink-0"
+                    className="shrink-0 h-8 text-xs sm:text-sm"
                   >
-                    {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Remove'}
+                    {loading ? <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" /> : 'Remove'}
                   </Button>
                 </div>
               ))}
               <div className="pt-4 sticky bottom-0 bg-background border-t border-border">
-                <div className="flex justify-between items-center mb-4 text-sm">
+                <div className="flex justify-between items-center mb-4 text-xs sm:text-sm">
                   <span className="font-medium">Cart Total:</span>
                   <span className="font-bold">${totalAmount.toFixed(2)}</span>
                 </div>
                 <div className="space-y-2">
                   <Button 
-                    className="w-full" 
+                    className="w-full text-xs sm:text-sm py-1 h-8 sm:h-10" 
                     onClick={handleCheckout}
                     disabled={loading || items.length === 0}
                   >
                     {loading ? (
                       <>
-                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                        <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin mr-1 sm:mr-2" />
                         Processing...
                       </>
                     ) : (
@@ -115,7 +116,7 @@ export function Cart() {
                   </Button>
                   <Button 
                     variant="outline"
-                    className="w-full" 
+                    className="w-full text-xs sm:text-sm py-1 h-8 sm:h-10" 
                     onClick={() => {
                       setIsOpen(false);
                       navigate('/cart');
@@ -126,13 +127,13 @@ export function Cart() {
                   </Button>
                   <Button 
                     variant="secondary"
-                    className="w-full flex items-center justify-center gap-2" 
+                    className="w-full flex items-center justify-center gap-1 sm:gap-2 text-xs sm:text-sm py-1 h-8 sm:h-10" 
                     onClick={() => {
                       setIsOpen(false);
                       navigate('/order-history');
                     }}
                   >
-                    <History className="h-4 w-4" />
+                    <History className="h-3 w-3 sm:h-4 sm:w-4" />
                     Order History
                   </Button>
                 </div>

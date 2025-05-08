@@ -1,5 +1,7 @@
+
 import React, { useState } from "react";
 import { formatDisplayText } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface FilterSidebarProps {
   filterTypes: Record<string, { label: string; file: string; path: string[]; type: string }[]>;
@@ -49,6 +51,7 @@ interface TreeNodeProps {
   toggleExpand: (pathKey: string) => void;
   parentPath?: string[];
 }
+
 const TreeNode: React.FC<TreeNodeProps> = ({
   node,
   onSelect,
@@ -60,12 +63,13 @@ const TreeNode: React.FC<TreeNodeProps> = ({
 }) => {
   const hasChildren = node.children && node.children.length > 0;
   const pathKey = [...parentPath, node.label].join("/");
+  const isMobile = useIsMobile();
 
   return (
     <li>
       <div 
         className="flex items-center group" 
-        style={{ paddingLeft: `${8 + level * 16}px` }}
+        style={{ paddingLeft: `${8 + level * (isMobile ? 10 : 16)}px` }}
       >
         {hasChildren ? (
           <button
@@ -87,14 +91,14 @@ const TreeNode: React.FC<TreeNodeProps> = ({
         )}
         {node.file ? (
           <button
-            className={`text-left text-sm w-full px-2 py-1 rounded 
+            className={`text-left text-xs sm:text-sm w-full px-2 py-1 rounded 
             ${selectedFile === node.file ? "bg-indigo-100 text-indigo-700 font-bold" : "hover:bg-gray-100"}`}
             onClick={() => onSelect(node.file!)}
           >
             {node.label}
           </button>
         ) : (
-          <span className="text-gray-700 text-sm">{node.label}</span>
+          <span className="text-gray-700 text-xs sm:text-sm">{node.label}</span>
         )}
       </div>
       {hasChildren && expandedPaths.has(pathKey) && (
@@ -123,6 +127,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   selectedFile,
 }) => {
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  const isMobile = useIsMobile();
 
   const toggleExpand = (pathKey: string) => {
     setExpandedPaths(prev => {
@@ -134,7 +139,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
   };
 
   return (
-    <aside className="w-full md:w-64 bg-white rounded-lg shadow p-4 mb-4 md:mb-0">
+    <aside className={`w-full bg-white rounded-lg shadow p-3 sm:p-4 ${isMobile ? '' : 'mb-4 md:mb-0'}`}>
       <svg style={{ display: "none" }}>
         <symbol id="chevron-down" viewBox="0 0 24 24">
           <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
@@ -143,16 +148,16 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
           <path d="M9 6l6 6-6 6" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round"/>
         </symbol>
       </svg>
-      <h2 className="font-bold text-lg mb-2">Filters</h2>
+      <h2 className="font-bold text-base sm:text-lg mb-2">Filters</h2>
       <div>
         {Object.keys(filterTypes).length === 0 ? (
-          <div className="text-gray-400 text-sm">No filters available</div>
+          <div className="text-gray-400 text-xs sm:text-sm">No filters available</div>
         ) : (
           Object.entries(filterTypes).map(([type, options]) => (
-            <div key={type} className="mb-4">
-              <div className="font-medium mb-1">{formatType(type)}</div>
+            <div key={type} className="mb-3 sm:mb-4">
+              <div className="font-medium text-sm sm:text-base mb-1">{formatType(type)}</div>
               {options.length > 0 ? (
-                <ul className="space-y-1">
+                <ul className="space-y-0.5 sm:space-y-1">
                   {
                     buildTree(options).map((node) => (
                       <TreeNode
@@ -168,7 +173,7 @@ const FilterSidebar: React.FC<FilterSidebarProps> = ({
                   }
                 </ul>
               ) : (
-                <div className="text-gray-400 text-sm">No {formatType(type).toLowerCase()} filters</div>
+                <div className="text-gray-400 text-xs sm:text-sm">No {formatType(type).toLowerCase()} filters</div>
               )}
             </div>
           ))

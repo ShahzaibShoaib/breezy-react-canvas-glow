@@ -1,11 +1,14 @@
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Trash2, ShoppingCart, Loader2 } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { format } from "date-fns";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function CartTable() {
   const { items, loading, removeFromCart, updateCartStatus } = useCart();
+  const isMobile = useIsMobile();
 
   const handleRemove = async (item: { Item_Name: string; Item_SKU: string; Item_Qty: number }) => {
     await removeFromCart({
@@ -43,6 +46,88 @@ export function CartTable() {
     );
   }
 
+  if (isMobile) {
+    // Mobile view - card-based layout
+    return (
+      <div className="space-y-4">
+        {items.map((item) => (
+          <div key={item.Cart_ID} className="border rounded-md p-4 space-y-3">
+            <div className="flex justify-between">
+              <h3 className="font-medium text-base">{item.Item_Name}</h3>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleRemove(item)}
+                disabled={loading}
+                title="Remove from cart"
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">SKU:</span>
+              <span>{item.Item_SKU}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Quantity:</span>
+              <span>{item.Item_Qty}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Price:</span>
+              <span>${item.Price_Per_Item.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm font-medium">
+              <span>Total:</span>
+              <span>${item.Total_Price.toFixed(2)}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Order Time:</span>
+              <span>{format(new Date(item.Order_Time), 'MMM d, yyyy HH:mm')}</span>
+            </div>
+            
+            <div className="flex justify-between text-sm">
+              <span className="text-muted-foreground">Status:</span>
+              <span className="capitalize">{item.Status}</span>
+            </div>
+          </div>
+        ))}
+        
+        <div className="border-t pt-4 mt-4">
+          <div className="flex justify-between font-medium text-lg mb-4">
+            <span>Total:</span>
+            <span>${totalAmount.toFixed(2)}</span>
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <div className="text-sm text-muted-foreground mb-2">
+              * Prices are shown in USD
+            </div>
+            <Button 
+              onClick={handleCheckout}
+              disabled={loading || items.length === 0}
+              className="w-full"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                  Processing...
+                </>
+              ) : (
+                'Proceed to Checkout'
+              )}
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Desktop view - table layout
   return (
     <div className="space-y-4">
       <div className="rounded-md border">

@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Loader2, ShoppingBag } from "lucide-react";
@@ -92,12 +93,12 @@ export default function OrderHistory() {
   }, {});
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="container mx-auto py-4 sm:py-8 px-2 sm:px-4 space-y-4 sm:space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-xl sm:text-2xl font-bold flex items-center gap-2">
             Order History
-            <span className="text-base font-normal text-muted-foreground">
+            <span className="text-sm sm:text-base font-normal text-muted-foreground">
               ({orders.length} {orders.length === 1 ? 'order' : 'orders'})
             </span>
           </h1>
@@ -109,6 +110,7 @@ export default function OrderHistory() {
           variant="outline"
           onClick={() => navigate('/')}
           className="flex items-center gap-2"
+          size="sm"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Shop
@@ -131,20 +133,20 @@ export default function OrderHistory() {
           </div>
         </div>
       ) : (
-        <div className="space-y-8">
+        <div className="space-y-6 sm:space-y-8">
           {Object.entries(groupedOrders).map(([timeKey, timeOrders]) => (
             <div key={timeKey} className="space-y-4">
-              <h2 className="text-lg font-semibold border-b pb-2">{timeKey}</h2>
-              <div className="rounded-md border overflow-hidden">
+              <h2 className="text-base sm:text-lg font-semibold border-b pb-2">{timeKey}</h2>
+              <div className="rounded-md border overflow-x-auto">
                 <Table>
                   <TableHeader>
                     <TableRow className="bg-muted/50">
-                      <TableHead className="w-[300px]">Item Name</TableHead>
-                      <TableHead className="w-[150px]">SKU</TableHead>
-                      <TableHead className="w-[100px] text-right">Quantity</TableHead>
-                      <TableHead className="w-[120px] text-right">Price</TableHead>
-                      <TableHead className="w-[120px] text-right">Total</TableHead>
-                      <TableHead className="w-[120px]">Status</TableHead>
+                      <TableHead className="w-[40%] sm:w-[300px]">Item Name</TableHead>
+                      <TableHead className="w-[20%] sm:w-[150px]">SKU</TableHead>
+                      <TableHead className="text-right w-[10%] sm:w-[100px]">Qty</TableHead>
+                      <TableHead className="text-right w-[15%] sm:w-[120px]">Price</TableHead>
+                      <TableHead className="text-right w-[15%] sm:w-[120px]">Total</TableHead>
+                      <TableHead className="hidden sm:table-cell w-[120px]">Status</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -155,7 +157,7 @@ export default function OrderHistory() {
                         <TableCell className="text-right">{order.Item_Qty}</TableCell>
                         <TableCell className="text-right">${order.Price_Per_Item.toFixed(2)}</TableCell>
                         <TableCell className="text-right">${order.Total_Price.toFixed(2)}</TableCell>
-                        <TableCell>
+                        <TableCell className="hidden sm:table-cell">
                           <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
                             order.Status === 'processed' 
                               ? 'bg-green-100 text-green-700' 
@@ -168,6 +170,24 @@ export default function OrderHistory() {
                         </TableCell>
                       </TableRow>
                     ))}
+                    <TableRow className="sm:hidden">
+                      <TableCell colSpan={5} className="py-2">
+                        {timeOrders.map((order) => (
+                          <div key={`mobile-status-${order.Cart_ID}-${order.Item_SKU}`} className="flex justify-between items-center mb-1">
+                            <span className="text-xs text-gray-500">{order.Item_SKU}</span>
+                            <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${
+                              order.Status === 'processed' 
+                                ? 'bg-green-100 text-green-700' 
+                                : order.Status === 'rejected'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-gray-100 text-gray-700'
+                            }`}>
+                              {order.Status.charAt(0).toUpperCase() + order.Status.slice(1)}
+                            </span>
+                          </div>
+                        ))}
+                      </TableCell>
+                    </TableRow>
                   </TableBody>
                 </Table>
               </div>
@@ -178,13 +198,13 @@ export default function OrderHistory() {
             </div>
           ))}
           
-          <div className="flex justify-between items-center pt-6 mt-6 border-t">
-            <div className="text-sm text-muted-foreground">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pt-4 sm:pt-6 mt-4 sm:mt-6 border-t">
+            <div className="text-sm text-muted-foreground mb-2 sm:mb-0">
               * All prices are in USD
             </div>
-            <div className="text-right">
+            <div className="text-right w-full sm:w-auto">
               <div className="text-sm text-muted-foreground mb-1">Total Amount</div>
-              <div className="text-2xl font-bold">${totalAmount.toFixed(2)}</div>
+              <div className="text-xl sm:text-2xl font-bold">${totalAmount.toFixed(2)}</div>
             </div>
           </div>
         </div>

@@ -1,4 +1,4 @@
-// filepath: c:\Users\XTI_PK_SHAHZAIB\OneDrive - Xclusive Trading Inc\Desktop\Backend Acc\Auth-form-updated.tsx
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
@@ -87,22 +87,22 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-6 sm:p-4">
       <Card className="w-full max-w-md">
         {/* Logo on top */}
         <div className="flex justify-center mt-4">
           <img
             src="https://alphacomm.com/wp-content/uploads/2021/05/alphacomm-logo.png"
             alt="Superior Logo"
-            className="h-16"
+            className="h-12 sm:h-16"
           />
         </div>
 
         {/* Login form */}
         <form onSubmit={handleLogin}>
           <CardHeader>
-            <CardTitle>Login</CardTitle>
-            <CardDescription>Welcome back! Please log in to continue.</CardDescription>
+            <CardTitle className="text-xl sm:text-2xl text-center">Login</CardTitle>
+            <CardDescription className="text-center">Welcome back! Please log in to continue.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
