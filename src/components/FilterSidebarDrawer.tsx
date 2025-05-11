@@ -3,6 +3,7 @@ import React from "react";
 import { Menu } from "lucide-react";
 import FilterSidebar from "@/components/FilterSidebar";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Drawer,
   DrawerContent,
@@ -32,20 +33,22 @@ const FilterSidebarDrawer: React.FC<FilterSidebarDrawerProps> = ({
           <span className="sr-only">Open filters</span>
         </Button>
       </DrawerTrigger>
-      <DrawerContent>
+      <DrawerContent className="max-h-[85vh]">
         <DrawerHeader className="text-left">
           <DrawerTitle>Filters</DrawerTitle>
         </DrawerHeader>
-        <div className="px-4 pb-6">
-          <FilterSidebar 
-            filterTypes={filterTypes} 
-            onSelect={(file) => {
-              onSelect(file);
-              setOpen(false);
-            }} 
-            selectedFile={selectedFile} 
-          />
-        </div>
+        <ScrollArea className="px-4 pb-6 h-[calc(85vh-60px)]">
+          <div className="pr-3">
+            <FilterSidebar 
+              filterTypes={filterTypes} 
+              onSelect={(file) => {
+                onSelect(file);
+                setOpen(false);
+              }} 
+              selectedFile={selectedFile} 
+            />
+          </div>
+        </ScrollArea>
       </DrawerContent>
     </Drawer>
   );
