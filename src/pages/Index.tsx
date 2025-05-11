@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from 'react-redux';
@@ -7,13 +6,13 @@ import { logout } from '@/store/authSlice';
 import { getXlsxFileNames, parseFiltersFromFilenames } from "@/lib/getCsvFileNames";
 import { parseXlsx } from "@/lib/parseXlsx";
 import FilterSidebar from "@/components/FilterSidebar";
+import FilterSidebarDrawer from "@/components/FilterSidebarDrawer";
 import ProductGrid from "@/components/ProductGrid";
 import { Button } from "@/components/ui/button";
-import { LogOut, Menu } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { Cart } from "@/components/Cart";
 import { toast } from "@/components/ui/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -27,7 +26,6 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const isMobile = useIsMobile();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     const loadFileNames = async () => {
@@ -109,19 +107,6 @@ const Index = () => {
     (p.SKU || "").toLowerCase().includes(search.toLowerCase())
   ) : products;
 
-  const renderFilterSidebar = () => (
-    <FilterSidebar
-      filterTypes={filterTypes}
-      onSelect={(file) => {
-        setSelectedFile(file);
-        if (isMobile) {
-          setSidebarOpen(false);
-        }
-      }}
-      selectedFile={selectedFile}
-    />
-  );
-
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col w-full">
       <header className="w-full bg-white border-b sticky top-0 z-50 shadow-sm">
@@ -129,16 +114,11 @@ const Index = () => {
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               {isMobile && (
-                <Sheet open={sidebarOpen} onOpenChange={setSidebarOpen}>
-                  <SheetTrigger asChild>
-                    <Button variant="outline" size="icon">
-                      <Menu className="h-4 w-4" />
-                    </Button>
-                  </SheetTrigger>
-                  <SheetContent side="left" className="w-[85%] sm:w-[350px] pt-10">
-                    {renderFilterSidebar()}
-                  </SheetContent>
-                </Sheet>
+                <FilterSidebarDrawer 
+                  filterTypes={filterTypes}
+                  onSelect={setSelectedFile}
+                  selectedFile={selectedFile}
+                />
               )}
               <img 
                 src="https://alphacomm.com/wp-content/uploads/2021/05/alphacomm-logo.png" 
@@ -186,7 +166,11 @@ const Index = () => {
       <div className="flex flex-col md:flex-row flex-1">
         {!isMobile && (
           <div className="md:pt-8 pt-4 md:pr-8 md:pl-8 pl-2 pr-2 flex-none md:w-72 w-full">
-            {renderFilterSidebar()}
+            <FilterSidebar
+              filterTypes={filterTypes}
+              onSelect={setSelectedFile}
+              selectedFile={selectedFile}
+            />
           </div>
         )}
         <main className="flex-1 p-2 sm:p-4 md:pt-8 max-w-screen-xl mx-auto md:pr-8">
